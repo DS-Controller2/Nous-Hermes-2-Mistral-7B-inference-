@@ -1,0 +1,53 @@
+# --- Log files ---
+# Ignore all content within the logs directory, except for .gitkeep
+logs/*
+!logs/.gitkeep
+
+# --- Model files ---
+# Ignore all content within the models directory, except for .gitkeep
+# This prevents committing large model files downloaded by Hugging Face.
+models/*
+!models/.gitkeep
+# If models are in subdirectories like models/NousResearch/Nous-Hermes-2-SOLAR-10.7B/
+# then models/** might be more appropriate, still with !models/.gitkeep.
+# For simplicity, models/* covers direct children. If deep nesting of empty dirs
+# that need tracking is a concern, then a more specific approach might be needed,
+# but usually .gitkeep in the root of `models` is sufficient.
+
+# --- Python Virtual Environment ---
+# Ignore virtual environment directories. Common names include venv, .venv, vllm_env.
+*venv/
+vllm_env/
+.venv/
+
+# --- Configuration Files ---
+# Ignore the actual configuration file containing sensitive tokens.
+# The example file (config.sh.example) should be tracked.
+config/config.sh
+
+# --- Downloaded Archives ---
+# Ignore downloaded zip files, like ngrok.
+*.zip
+ngrok-stable-linux-amd64.zip # Specific ngrok archive name
+
+# --- IDE / Editor specific files ---
+.vscode/
+.idea/
+*.pyc
+__pycache__/
+.DS_Store
+
+# --- Ngrok local configuration (if created locally) ---
+# Typically ~/.ngrok2/ngrok.yml, but if forced local via --config flag.
+# .ngrok2/
+
+# --- Temporary files ---
+*.tmp
+*.swp
+*.swo
+
+# --- Output from other tools/processes ---
+# For example, if test reports or build artifacts are generated.
+# report.html
+# dist/
+# build/

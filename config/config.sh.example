@@ -1,0 +1,93 @@
+# -----------------------------------------------------------------------------
+# Example Configuration for deploy_llm_server.sh
+#
+# Instructions:
+# 1. Copy this file to 'config/config.sh'.
+#    cp config/config.sh.example config/config.sh
+# 2. Edit 'config/config.sh' with your actual settings.
+#    DO NOT commit your actual 'config.sh' file if it contains sensitive tokens.
+# -----------------------------------------------------------------------------
+
+# --- Model Configuration ---
+# Set 'USE_TEST_MODEL' to "true" to use the CPU model for testing.
+# Set to "false" (or any other string) to use the GPU model.
+USE_TEST_MODEL="false"
+
+# Model identifier for GPU mode (e.g., from Hugging Face)
+MODEL_ID_GPU="NousResearch/Nous-Hermes-2-SOLAR-10.7B"
+#MODEL_ID_GPU="TheBloke/Nous-Hermes-2-SOLAR-10.7B-AWQ" # Example for AWQ
+
+# Model identifier for CPU mode (should be a smaller model suitable for CPU)
+MODEL_ID_CPU="gpt2" # Or "sshleifer/tiny-gpt2" or similar small model
+
+# Extra arguments for vLLM in GPU mode
+# For AWQ, add: --quantization awq
+# For multi-GPU, tensor_parallel_size should match number of GPUs you want to use.
+VLLM_EXTRA_ARGS_GPU="--tensor-parallel-size 1 --gpu-memory-utilization 0.90 --max-model-len 4096"
+# Example for AWQ:
+# VLLM_EXTRA_ARGS_GPU="--quantization awq --tensor-parallel-size 1 --gpu-memory-utilization 0.90 --max-model-len 4096"
+
+
+# Extra arguments for vLLM in CPU mode
+# --device cpu is the key. Other args might be needed depending on the model.
+# Remove GPU specific args like tensor-parallel-size or gpu-memory-utilization if they cause errors.
+VLLM_EXTRA_ARGS_CPU="--device cpu --max-model-len 1024"
+
+# --- vLLM Server Configuration ---
+VLLM_HOST="0.0.0.0"  # Host IP for the vLLM server
+VLLM_PORT="8000"     # Port for the vLLM server
+
+# --- Ngrok Configuration ---
+# Your Ngrok authentication token (get from https://dashboard.ngrok.com/get-started/your-authtoken)
+NGROK_AUTHTOKEN="YOUR_NGROK_AUTHTOKEN_HERE"
+
+# A descriptive name for your Ngrok tunnel (shows up in Ngrok dashboard)
+# This name is currently used for logging/reference purposes by the script.
+# If you have a paid ngrok plan and want a specific subdomain, you might need to adjust
+# the ngrok command in deploy_llm_server.sh (e.g. use --domain or --subdomain).
+NGROK_TUNNEL_NAME="vllm-server-tunnel"
+
+# --- Directory Configuration ---
+# Location for the Python virtual environment
+VENV_DIR="./vllm_env"
+
+# Directory for log files
+LOG_DIR="./logs"
+
+# Directory for Hugging Face model cache (HF_HOME/HUGGINGFACE_HUB_CACHE will be set to this)
+MODEL_CACHE_DIR="./models"
+
+
+# --- Keep-Alive Service Configuration ---
+# Set to "true" to enable the keep-alive service, "false" to disable.
+ENABLE_KEEP_ALIVE="false"
+
+# Initial delay (in minutes) after script start before the first keep-alive prompt is sent.
+IDLE_THRESHOLD_MINUTES="60"
+
+# Interval (in minutes) between subsequent keep-alive prompts after the initial delay.
+KEEPALIVE_PROMPT_INTERVAL_MINUTES="5"
+
+# Bash array of prompts to send. The service will cycle through these.
+# Ensure prompts are properly quoted if they contain spaces or special characters.
+KEEPALIVE_PROMPTS=(
+    "What is the capital of France?"
+    "Tell me a short joke about a robot."
+    "Summarize the theory of relativity in one sentence."
+    "Who painted the Mona Lisa?"
+)
+
+# Optional: Specify a model ID to use for keep-alive requests.
+# If empty or not set, it defaults to the currently selected model (MODEL_ID_CPU or MODEL_ID_GPU).
+# This can be useful if you want keep-alive to use a very small/fast model
+# while your main model is larger.
+KEEPALIVE_MODEL_ID_OVERRIDE="" # e.g., "gpt2"
+
+# Target endpoint for keep-alive prompts.
+# Defaults to the vLLM OpenAI-compatible chat completions endpoint using configured VLLM_HOST and VLLM_PORT.
+# Make sure VLLM_HOST and VLLM_PORT are defined before this variable if you use them here.
+# The ${VAR:-default} syntax ensures that if VLLM_HOST or VLLM_PORT are somehow not set when this is defined,
+# it falls back to a default value for constructing the URL.
+KEEPALIVE_TARGET_ENDPOINT="http://${VLLM_HOST:-0.0.0.0}:${VLLM_PORT:-8000}/v1/chat/completions"
+
+# --- End of Configuration ---
