@@ -98,7 +98,7 @@ Key configuration variables in `config/config.sh.example` (and thus in your `con
 1.  **Clone the repository (if you haven't already):**
     ```bash
     git clone https://github.com/DS-Controller2/Nous-Hermes-2-Mistral-7B-inference-.git
-    cd [<repository_directory>](https://github.com/DS-Controller2/Nous-Hermes-2-Mistral-7B-inference-.git)
+    cd clone https://github.com/DS-Controller2/Nous-Hermes-2-Mistral-7B-inference-.git
     ```
 
 2.  **Set up Configuration:**
